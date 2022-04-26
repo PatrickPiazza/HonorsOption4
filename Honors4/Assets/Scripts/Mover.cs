@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class Mover : MonoBehaviour
 {
@@ -10,7 +12,13 @@ public class Mover : MonoBehaviour
     public GameObject respawn1;
     public GameObject respawn2;
     public GameObject respawn3;
+	public GameObject level1;
+	public GameObject level2;
+	public GameObject level3;
+	public static float currentTime = 0.0f;
+	[SerializeField] private bool finished = false;
     [SerializeField] private int level = 1;
+	[SerializeField] private TextMeshProUGUI timeText;
 
     private Rigidbody rb;
 
@@ -20,7 +28,20 @@ public class Mover : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+		finished = false;
+		level = 1;
     }
+	
+	void Update()
+	{
+		if(!finished)
+		{
+		currentTime += Time.deltaTime;
+		}
+		
+		double b = System.Math.Round (currentTime, 2);     
+		timeText.text = b.ToString ();
+	}
 
     private void OnMove(InputValue movementValue)
     {
@@ -48,5 +69,27 @@ public class Mover : MonoBehaviour
         {
             this.transform.position = (new Vector3(respawner.transform.position.x, respawner.transform.position.y, respawner.transform.position.z));
         }
+		
+		if(other.gameObject.CompareTag("Goal") && level == 1)
+		{
+			level++;
+			level1.SetActive(false);
+			level2.SetActive(true);
+			respawner.transform.position = (new Vector3(respawn2.transform.position.x, respawn2.transform.position.y, respawn2.transform.position.z));
+			this.transform.position = (new Vector3(respawner.transform.position.x, respawner.transform.position.y, respawner.transform.position.z));
+		}
+		else if(other.gameObject.CompareTag("Goal") && level == 2)
+		{
+			level++;
+			level2.SetActive(false);
+			level3.SetActive(true);
+			respawner.transform.position = (new Vector3(respawn3.transform.position.x, respawn3.transform.position.y, respawn3.transform.position.z));
+			this.transform.position = (new Vector3(respawner.transform.position.x, respawner.transform.position.y, respawner.transform.position.z));
+		}
+		else if(other.gameObject.CompareTag("Goal") && level == 3)
+		{
+			finished = true;
+			SceneManager.LoadScene("Menus");
+		}
     }
 }
