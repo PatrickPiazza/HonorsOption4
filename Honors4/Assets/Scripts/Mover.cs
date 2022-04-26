@@ -10,6 +10,7 @@ public class Mover : MonoBehaviour
     public GameObject respawn1;
     public GameObject respawn2;
     public GameObject respawn3;
+    [SerializeField] private int level = 1;
 
     private Rigidbody rb;
 
