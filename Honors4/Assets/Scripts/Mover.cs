@@ -16,9 +16,11 @@ public class Mover : MonoBehaviour
 	public GameObject level2;
 	public GameObject level3;
 	public static float currentTime = 0.0f;
+	public static int blocks = 0;
 	[SerializeField] private bool finished = false;
     [SerializeField] private int level = 1;
 	[SerializeField] private TextMeshProUGUI timeText;
+	[SerializeField] private TextMeshProUGUI blocksText;
 
     private Rigidbody rb;
 
@@ -28,6 +30,8 @@ public class Mover : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+		blocks = 0;
+		currentTime = 0.0f;
 		finished = false;
 		level = 1;
     }
@@ -41,6 +45,19 @@ public class Mover : MonoBehaviour
 		
 		double b = System.Math.Round (currentTime, 2);     
 		timeText.text = b.ToString ();
+		
+		blocksText.text = "Blocks: "+blocks;
+		
+		if(Input.GetKeyDown(KeyCode.P))
+		{
+			Debug.LogWarning("PURGING WITH FIRE!!!!!!!!!");
+			TimeManager.DeleteValues();
+		}
+		
+		if(Input.GetKeyDown(KeyCode.Escape))
+		{
+			Application.Quit();
+		}
 	}
 
     private void OnMove(InputValue movementValue)
@@ -63,11 +80,14 @@ public class Mover : MonoBehaviour
         if(other.gameObject.CompareTag("Pickup"))
         {
             other.gameObject.SetActive(false);
+			blocks++;
         }
 
         if(other.gameObject.CompareTag("Death"))
         {
             this.transform.position = (new Vector3(respawner.transform.position.x, respawner.transform.position.y, respawner.transform.position.z));
+			TimeManager.totalFalls++;
+			TimeManager.StoreValues();
         }
 		
 		if(other.gameObject.CompareTag("Goal") && level == 1)
@@ -89,7 +109,9 @@ public class Mover : MonoBehaviour
 		else if(other.gameObject.CompareTag("Goal") && level == 3)
 		{
 			finished = true;
-			SceneManager.LoadScene("Menus");
+			TimeManager.totalCompletions++;
+			TimeManager.StoreValues();
+			SceneManager.LoadScene("Levels1-5");
 		}
     }
 }
